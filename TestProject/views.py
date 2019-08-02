@@ -15,3 +15,7 @@ def saveToDb(request, name):
 
 def index(request):
     return HttpResponse("<h2>You have reached the homepage</h2>")
+
+
+def testsisi(request):
+    return HttpResponse('<h1>장고 배포 성공</h1>')
