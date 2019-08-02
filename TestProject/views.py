@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Name
+
+
 def hello(request, name):
     return render(request, "hello.html", {"name": name})
 
