@@ -22,5 +22,5 @@ urlpatterns = [
     path('hello/<name>', hello),
     path('savetodb/<name>', saveToDb),
     path('', index),
-    path('testsisi/', testsisi)
+    path('testsisi', testsisi)
 ]
