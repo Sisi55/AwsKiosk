@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 
+from .request_model_train import get_emotion_vec
 
 #초기화
 #cred = credentials.Certificate('kiosk-firestore-jnsy-bcfe4-firebase-adminsdk-269q4-4a795774bb.json')
@@ -16,15 +17,16 @@ from sklearn.preprocessing import LabelEncoder
 #encoder = LabelEncoder() #레이블 벡터 -> 변환 객체
 
 # 8가지 감정 키워드
-emotion_keyword = ["anger","contempt","disgust","fear","happiness","neutral","sadness","surprise"]
+emotion_keyword_to_vec = get_emotion_vec()
+# emotion_keyword = ["anger","contempt","disgust","fear","happiness","neutral","sadness","surprise"]
 
-emotion_df = pd.DataFrame({ 'emotion_keyword':emotion_keyword })
-emotion_vec = pd.get_dummies(emotion_df).values
-#print(emotion_vec)
+# emotion_df = pd.DataFrame({ 'emotion_keyword':emotion_keyword })
+# emotion_vec = pd.get_dummies(emotion_df).values
+# #print(emotion_vec)
 
-emotion_keyword_to_vec = {}
-for index,keyword in enumerate(emotion_keyword):
-    emotion_keyword_to_vec[keyword] = ''.join(list(map(str,emotion_vec[index].tolist())))
+# emotion_keyword_to_vec = {}
+# for index,keyword in enumerate(emotion_keyword):
+#     emotion_keyword_to_vec[keyword] = ''.join(list(map(str,emotion_vec[index].tolist())))
 
 
 def get_dataFrame():

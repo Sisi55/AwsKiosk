@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics.pairwise import cosine_similarity
+import json
 
 
 #cred = credentials.Certificate('kiosk-firestore-jnsy-bcfe4-firebase-adminsdk-269q4-4a795774bb.json')
@@ -109,12 +110,19 @@ def items_sim_dict(user_id,ratings_matrix,item_sim_df):
 
 def processing_to_str(result,item_sim_des_dict):
     
-    temp_str = '{'
-    for index,value in item_sim_des_dict.items():
-        temp_str = temp_str +'"'+ index +'"'+ ":" + '"'+value + '",'
-    temp_str = temp_str + '}'
+    # temp_str = '{'
+    # for index,value in item_sim_des_dict.items():
+    #     temp_str = temp_str +'"'+ index +'"'+ ":" + '"'+value + '",'
+    # temp_str = temp_str + '}'
+    #item_sim_dict = json.dumps(item_sim_des_dict, ensure_ascii=False, indent=4)
+    keys = ('user_cf','items_sim')
+    values = (result, item_sim_des_dict)
+    #result_zip = zip(keys, values)
+    result_dict = dict(zip(keys, values))
+    #result_dict = {}
+    #map(lambda k,v: result_dict.update({k:v}), keys, values)
     
-    return '{"user_cf":"'+ result +'","items_sim":'+ temp_str +'}'
+    return json.dumps(result_dict, ensure_ascii=False)#, indent=4)#'{"user_cf":"'+ result +'","items_sim":'+ temp_str +'}'
     
 
 
