@@ -63,7 +63,7 @@ def xgb_recom(request, today,humidity,temp,speed,emo1,emo2): # 특징에 해당�
 
     check_time_and_decide_to_train_model()
 
-    return HttpResponse('<p>'+ result_json +'</p>') # 객체
+    return HttpResponse(result_json) # 객체
 
 
 
@@ -116,7 +116,7 @@ def weather_emotion_recom(request):
 
     result_json = json.dumps(return_dict, ensure_ascii=False)
 
-    return HttpResponse('<p>'+ result_json +'</p>')
+    return HttpResponse(result_json)
 
 
 # 선호도
@@ -128,7 +128,7 @@ def itemCF(request, user_uuid):#사용자1, 아이템1
     # 사용자 > 안먹은 아이템  각각 하나씩
     #result = "{'user_cf':"+item_cf_result+",'items_sim':"+items_sim_dict+"}"
 
-    return HttpResponse('<p>'+ result +'</p>') ## 마지막 str
+    return HttpResponse(result) ## 마지막 str
 
 ###
 
@@ -158,7 +158,7 @@ def lambda_handler(request,humidity,temp,speed,emo1,emo2):#사용자1
     
     result_predict = order_decisionTree_recom(humidity,temp,speed,emo1,emo2)
 
-    return HttpResponse('<p>'+ result_predict +'</p>')
+    return HttpResponse(result_predict)
 
 
 # def hello(request, name):

@@ -26,11 +26,11 @@ urlpatterns = [
     # xgb 분류 알고리즘으로 아이템 유사도 행렬 결과 반환 -- 타추천
     # /xgb_recom/2019-09-09%2021:05:58/80.0/300.0/1.00/happiness/neutral
     path('xgb_recom/<today>/<humidity>/<temp>/<speed>/<emo1>/<emo2>', views.xgb_recom),
-    
+
     # path('hello/<name>', hello),
     # path('savetodb/<name>', saveToDb),
     # 선호도 기반 유사도 행렬 결과: 타추천, 상세
-    # 911283bd-2e4f-439b-89c4-fc8667782b51
+    # /item_cf/911283bd-2e4f-439b-89c4-fc8667782b51
     path('item_cf/<user_uuid>', views.itemCF), #userid말고 uuid를 주겠지 함수에서 변경해야 한다
     
     # 날씨,감정 기반 유사도 행렬 결과: 상세
