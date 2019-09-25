@@ -117,6 +117,7 @@ def processing_to_str(result,item_sim_des_dict):
     #item_sim_dict = json.dumps(item_sim_des_dict, ensure_ascii=False, indent=4)
     keys = ('user_cf','items_sim')
     values = (result, item_sim_des_dict)
+    print(result, item_sim_des_dict)
     #result_zip = zip(keys, values)
     result_dict = dict(zip(keys, values))
     #result_dict = {}
