@@ -27,7 +27,7 @@ def xgb_recom(request, today,humidity,temp,speed,emo1,emo2): # 특징에 해당�
     emotion_keyword_to_vec = get_emotion_vec()
     encode_emo1 = str(emotion_keyword_to_vec.get(emo1))
     encode_emo2 = str(emotion_keyword_to_vec.get(emo2))
-    encode_emotion = encode_emo1+encode_emo1
+    encode_emotion = encode_emo1+encode_emo2
 
     # 날 수 계산해서 휴일/평일, 아침/점심/저녁 추출하면 되겠다
     # today도 받아와야 한다
@@ -35,7 +35,7 @@ def xgb_recom(request, today,humidity,temp,speed,emo1,emo2): # 특징에 해당�
     date = today[0]
     time = today[1]
 
-    num_of_days = date_to_VIP(date)
+    num_of_days = date_to_VIP(date) # 날 수
     work_or_free = num_of_days_to_work_or_free(num_of_days) # 날수 > 평일/휴일
     time_3 = time_to_3(time) # 시간 > 아침/점심/저녁
 
@@ -43,11 +43,12 @@ def xgb_recom(request, today,humidity,temp,speed,emo1,emo2): # 특징에 해당�
     feature_names = ['w_humidity','w_temp','w_speed','emotion','work_or_free','time_to_3']
     input_df = pd.DataFrame([input_features], columns=feature_names)
 
-    # 그리고 모델 pkl 읽어와서
+    # 그리고 학습에 소요되는 시간을 줄이기 위해 저장한
+    # 모델/메뉴이름 디코딩하는 .pkl 읽어온다
     with open('xgb_baseline.pkl', 'rb') as f:
-        model = pickle.load(f)
+        model = pickle.load(f) # xgboost 모델
     with open('item_name.pkl', 'rb') as f:
-        item_name_restore = pickle.load(f)    
+        item_name_restore = pickle.load(f) # 메뉴 이름 디코딩용 객체   
     # reload_data = {'model':'', 'item_name_restore':''}
     # with open('xgb_baseline.pkl', 'rb') as f:
     #     for x in reload_data.keys(): #2번 ?
@@ -61,6 +62,7 @@ def xgb_recom(request, today,humidity,temp,speed,emo1,emo2): # 특징에 해당�
 
     result_json = json.dumps(dict({'item':str(result_item_name)}), ensure_ascii=False)
 
+    # 재학습 요청 함수
     check_time_and_decide_to_train_model()
 
     return HttpResponse(result_json) # 객체
@@ -183,7 +185,7 @@ def index(request):
 def weather_emo_similiar(emotion_keyword_to_vec): # views.py
     
     # order_df 만들기    
-    docs = firestore.client().collection(u'order').stream()
+    docs = firestore.client().collection(u'cre_order').stream()
 
     doc_list = []
     for doc in docs:

@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 
-from .request_model_train import get_emotion_vec
+# from .request_model_train import get_emotion_vec
 
 #초기화
 #cred = credentials.Certificate('kiosk-firestore-jnsy-bcfe4-firebase-adminsdk-269q4-4a795774bb.json')
@@ -30,7 +30,7 @@ emotion_keyword_to_vec = get_emotion_vec()
 
 
 def get_dataFrame():
-    docs = firestore.client().collection(u'order').stream()
+    docs = firestore.client().collection(u'cre_order').stream()
 
     doc_list = []
     for doc in docs:

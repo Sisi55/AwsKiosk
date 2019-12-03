@@ -1,6 +1,6 @@
 from firebase_admin import firestore
-from imblearn.over_sampling import SMOTE
-from xgboost import XGBClassifier
+# from imblearn.over_sampling import SMOTE
+# from xgboost import XGBClassifier
 import pickle
 import pandas as pd
 from django.utils import timezone
@@ -9,19 +9,20 @@ from django.utils import timezone
 
 def check_time_and_decide_to_train_model():
 
-    # 저장한 이전 시간을 가져오고
+    # Firestore에서 저장한 이전 시간을 가져오고
     pre_time_dict = firestore.client().collection(u'time').document(u'pre_request_time').get().to_dict()
     pre_time = pre_time_dict['time'] # 이전 갱신 시간 str
-    pre_update_minute = int(pre_time.split(':')[1]) % 10 # 나머지
+    pre_update_minute = int(pre_time.split(':')[1]) % 10 # 나머지 : 분
 
-    # 현재 시간을 저장한다
+    # 현재 시간
     now = str(timezone.localtime())
     date = str(now).split(' ')[1] # 0은 yymmdd, 1은 hhmmss
-    date = date.split('.')[0] #18:40:16 형태
+    date = date.split('.')[0] # 18:40:16 형태
     now_minute = int(date.split(':')[1]) % 10
 
     # pre_update_minute 과 now_minute 이
     # 같지 않으면 모델 재학습 요청하기
+    # 즉, 10분 단위로 재학습하게 한다
     if pre_update_minute != now_minute:
         # 재학습 요청
         request_model_train() # 모델 재학습한다
@@ -113,7 +114,8 @@ def get_emotion_vec():
 
 
 def request_model_train():
-
+    # cred = credentials.Certificate('../kiosk-firestore-jnsy-bcfe4-firebase-adminsdk-269q4-4a795774bb.json')
+    # firebase_admin.initialize_app(cred)
     # emotion_keyword_to_vec를 만든다
     emotion_keyword_to_vec = get_emotion_vec()
 
@@ -122,7 +124,7 @@ def request_model_train():
 # order에 있는 데이터 가져오자
 # doc_df를 만들었다
 
-    docs = firestore.client().collection(u'order').stream()
+    docs = firestore.client().collection(u'cre_order').stream()
 
     doc_list = []
     for doc in docs:

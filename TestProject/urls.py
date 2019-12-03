@@ -25,7 +25,7 @@ urlpatterns = [
     
     # xgb 분류 알고리즘으로 아이템 유사도 행렬 결과 반환 -- 타추천
     # /xgb_recom/2019-09-09%2021:05:58/80.0/300.0/1.00/happiness/neutral
-    path('xgb_recom/<today>/<humidity>/<temp>/<speed>/<emo1>/<emo2>', views.xgb_recom),
+    # path('xgb_recom/<today>/<humidity>/<temp>/<speed>/<emo1>/<emo2>', views.xgb_recom),
 
     # path('hello/<name>', hello),
     # path('savetodb/<name>', saveToDb),

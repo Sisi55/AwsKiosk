@@ -13,7 +13,7 @@ import json
 
 
 def get_user_rating_list(tag='user'):
-    docs = firestore.client().collection(tag).stream()
+    docs = firestore.client().collection(tag).stream() # orderDB
     doc_list = []
     
     for doc in docs:
@@ -43,14 +43,16 @@ def userid_preprocessing(rating_item_df): #userid 전처리
     
     userid_encoder = LabelEncoder()
     users = rating_item_df['userid'].values.tolist()
-    userid_encoder.fit(users)
+    userid_encoder.fit(users) # uuid를 label 인코딩한다
     users_vec = userid_encoder.transform(users)
     
 #print('인코딩 클래스:', userid_encoder.classes_)
-#print('디코딩 원본 값:', encoder.inverse_transform([0,1])) #리스트나 스칼라로 전달하면 변환해서 반환함
-    rating_item_df['userid'] = pd.Series(users_vec)
+#print('디코딩 원본 값:', encoder.inverse_transform([0,1])) 
+#리스트나 스칼라로 전달하면 변환해서 반환함
+
+    rating_item_df['userid'] = pd.Series(users_vec) # 데이터 교체
     
-    return userid_encoder,rating_item_df # 사용자가 아이템에 점수 매긴 DF ## return
+    return userid_encoder,rating_item_df # 사용자가 아이템에 점수 매긴 DF
 
 
 def preference_df(ratings_matrix,item_sim_df):
@@ -59,6 +61,7 @@ def preference_df(ratings_matrix,item_sim_df):
     df = pd.DataFrame(data=ratings_pred, index=ratings_matrix.index, columns=ratings_matrix.columns)
     
     return df
+
 
 def user_already_ordered(user_id,ratings_matrix):
     user_rating = ratings_matrix.loc[user_id,:] # 그래서 슬라이싱을 했구나
@@ -69,9 +72,10 @@ def item_cf(user_id,ratings_matrix,ratings_pred_matrix,top_n=1): #
     
     already_ordered = user_already_ordered(user_id,ratings_matrix)
     
-    order_list = ratings_matrix.columns.tolist() # 전체 메뉴판에서 가져올 필요가 없다 계산못하니까
+    order_list = ratings_matrix.columns.tolist() # 메뉴 아이템 이름
     unordered_list = [item for item in order_list if item not in already_ordered]
     recomm_item = ratings_pred_matrix.loc[user_id, unordered_list].sort_values(ascending=False)[:top_n]
+    print(type(recomm_item))
     
     return recomm_item #추천 아이템 1개
 
@@ -89,7 +93,8 @@ def not_order_item_dict(already_ordered,item_sim_des_dict):
     
     return return_dict
 
-
+# 모든 아이템에 대해 유사도가 가장 높은 아이템 하나씩 할당한다
+# 사용자가 먹지 않은 아이템에 대해
 def items_sim_dict(user_id,ratings_matrix,item_sim_df):
     already_ordered = user_already_ordered(user_id,ratings_matrix) #list
     
@@ -105,25 +110,17 @@ def items_sim_dict(user_id,ratings_matrix,item_sim_df):
     
         item_sim_des_dict[item] = item_sim_des_list #하나만
         
-    return not_order_item_dict(already_ordered,item_sim_des_dict)
+    return not_order_item_dict(already_ordered,item_sim_des_dict) # python dict 형태로 반환한다
 
 
 def processing_to_str(result,item_sim_des_dict):
     
-    # temp_str = '{'
-    # for index,value in item_sim_des_dict.items():
-    #     temp_str = temp_str +'"'+ index +'"'+ ":" + '"'+value + '",'
-    # temp_str = temp_str + '}'
-    #item_sim_dict = json.dumps(item_sim_des_dict, ensure_ascii=False, indent=4)
     keys = ('user_cf','items_sim')
     values = (result, item_sim_des_dict)
     print(result, item_sim_des_dict)
-    #result_zip = zip(keys, values)
     result_dict = dict(zip(keys, values))
-    #result_dict = {}
-    #map(lambda k,v: result_dict.update({k:v}), keys, values)
-    
-    return json.dumps(result_dict, ensure_ascii=False)#, indent=4)#'{"user_cf":"'+ result +'","items_sim":'+ temp_str +'}'
+
+    return json.dumps(result_dict, ensure_ascii=False)
     
 
 
@@ -134,8 +131,7 @@ def item_collaborativeFiltering(user_uuid): ## 매개 request 포함 path() 설�
     rating_item_df = pd.DataFrame(user_items_list, columns=['userid','itemid','rating']) #ndarray로 변환
     userid_encoder,rating_item_df = userid_preprocessing(rating_item_df)
     
-    user_id = userid_encoder.transform([user_uuid]).tolist()[0]
-    
+    user_id = userid_encoder.transform([user_uuid]).tolist()[0] # 안드로이드에서 전달한 사용자uuid 인코딩
     
     ratings_matrix = rating_item_df.pivot_table(values='rating', index='userid', columns='itemid').fillna(0)
     ratings_matrix_T = ratings_matrix.transpose()
@@ -144,8 +140,10 @@ def item_collaborativeFiltering(user_uuid): ## 매개 request 포함 path() 설�
     item_sim_df = pd.DataFrame(data=item_sim, index=ratings_matrix.columns, columns=ratings_matrix.columns)
     
     ratings_pred_matrix = preference_df(ratings_matrix, item_sim_df)
-    result = item_cf(user_id,ratings_matrix,ratings_pred_matrix).index.tolist()[0] #
-    
+    result_series = item_cf(user_id,ratings_matrix,ratings_pred_matrix) #
+    result = result_series.index
+    print("result", result)
+    result = result.tolist()[0]
     item_sim_des_dict = items_sim_dict(user_id,ratings_matrix,item_sim_df)
     
         #result = "{'user_cf':"+item_cf_result+",'items_sim':"+items_sim_dict+"}"
